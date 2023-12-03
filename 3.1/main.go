@@ -33,14 +33,13 @@ func main() {
 	}
 
 	lines := strings.Split(string(content), "\n")
-	var sum int
+	var sum, gearRatioSum int
 	for row, line := range lines {
 		if line == "" {
 			break
 		}
 		for column, character := range line {
 			if !unicode.IsDigit(character) && character != '.' {
-				fmt.Printf("Checking %c (%d, %d):\n", character, row, column)
 				// Above
 				if row > 0 {
 					sum += addNumbersForSymbol(lines[row-1], column)
@@ -52,10 +51,41 @@ func main() {
 				// Current line
 				sum += addNumbersForSymbol(line, column)
 			}
+
+			if character == '*' {
+				var adjacentNumbers []int
+				// Above
+				if row > 0 {
+					adjacentNumbers = append(adjacentNumbers, getAdjacentNumbers(lines[row-1], column)...)
+				}
+				//Below
+				if row < len(lines) {
+					adjacentNumbers = append(adjacentNumbers, getAdjacentNumbers(lines[row+1], column)...)
+				}
+
+				// Current line
+				adjacentNumbers = append(adjacentNumbers, getAdjacentNumbers(line, column)...)
+				if len(adjacentNumbers) == 2 {
+					gearRatioSum += adjacentNumbers[0]*adjacentNumbers[1]
+				}
+			}
 		}
 	}
 
 	fmt.Printf("Sum: %d\n", sum)
+	fmt.Printf("Gear Ratio Sum: %d\n", gearRatioSum)
+}
+
+func getAdjacentNumbers(line string, column int) (adjacentNumbers []int) {
+	numbersPattern := regexp.MustCompile(`\d+`)
+	numberIndicies := numbersPattern.FindAllStringIndex(line, -1)
+	for _, v := range numberIndicies {
+		if numberIsAdjacent(v, column){
+			number, _ := strconv.Atoi(line[v[0]:v[1]])
+			adjacentNumbers = append(adjacentNumbers, number)
+		}
+	}
+	return
 }
 
 func addNumbersForSymbol(line string, column int) int {
