@@ -10,18 +10,6 @@ import (
 	"strconv"
 )
 
-const UnicodeDigitOffset = 48
-
-func runeToIntValue(digit rune) int {
-	return int(digit) - UnicodeDigitOffset
-}
-
-func main2(){
-	str := "467..114.."
-	re := regexp.MustCompile(`\d+`)
-	fmt.Println(re.FindAllStringIndex(str, -1))
-}
-
 func main() {
 	if len(os.Args) < 1 {
 		log.Fatalf("Usage: %s <filename> \n", os.Args[0])
